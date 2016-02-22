@@ -1,15 +1,15 @@
 getWaterSpeedRecordFromWiki <- function() {
-# Water Speed Record (Prop-driven and Jet Hydroplane)
+	# Water Speed Record (Prop-driven and Jet Hydroplane)
 
-	library(XML)
-	library(RCurl)
-
-	nHeaderLines <- 1
+	library(rvest)
+	
+	nHeaderLines <- 0
 	url <- "https://en.wikipedia.org/wiki/Water_speed_record"
-	tables <- readHTMLTable(getURL(url), header=nHeaderLines) 
-	table <- tables[[2]]
-	date <- as.vector(table$V5)
-	speedRecordMph <- as.vector(table$V1)
+	
+	tables <- html(url) %>% html_nodes(".wikitable") %>% html_table(fill = TRUE)
+	table <- tables[[1]]
+	date <- as.vector(table[[5]])
+	speedRecordMph <- as.vector(table[[1]])
 
 	year <- vector()
 	speedMph <- vector()

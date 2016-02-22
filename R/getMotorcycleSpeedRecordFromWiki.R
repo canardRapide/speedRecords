@@ -1,15 +1,15 @@
 getMotorcyleSpeedRecordFromWiki <- function() {
 	# Land Speed Record (Motorcycle)
-	
-	library(XML)
-	library(RCurl)
 
-	nHeaderLines <- 2
+	library(rvest)
+	
+	nHeaderLines <- 1
 	url <- "https://en.wikipedia.org/wiki/Motorcycle_land-speed_record"
-	tables <- readHTMLTable(getURL(url), header = nHeaderLines) 
+	
+	tables <- html(url) %>% html_nodes(".wikitable") %>% html_table(fill = TRUE)
 	table <- tables[[1]]
-	date <- as.vector(table$V1)
-	speedRecordMph <- as.vector(table$V6)
+	date <- as.vector(table[[1]])
+	speedRecordMph <- as.vector(table[[6]])
 
 	year <- vector()
 	speedMph <- vector()

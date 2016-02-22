@@ -1,17 +1,17 @@
 getLandSpeedRecordFromWiki <- function() {
 	# Land Speed Record (Wheel-driven)
 	
-	library(XML)
-	library(RCurl)
-
-	nHeaderLines <- 2
+	library(rvest)
+	
+	nHeaderLines <- 1
 	url <- "https://en.wikipedia.org/wiki/Land_speed_record"
-	tables <- readHTMLTable(getURL(url), header = nHeaderLines) 
-	table <- tables[[2]]
-	date <- as.vector(table$V1)
-	speedOverKilometerMph <- as.vector(table$V6)
-	speedOverMileMph <- as.vector(table$V8)
-
+	
+	tables <- html(url) %>% html_nodes(".wikitable") %>% html_table(fill = TRUE)
+	table <- tables[[1]]
+	date <- as.vector(table[[1]])
+	speedOverKilometerMph <- as.vector(table[[6]])
+	speedOverMileMph <- as.vector(table[[8]])
+	
 	year <- vector()
 	speedMph <- vector()
 	for (it in (nHeaderLines+1):length(date)) {
@@ -26,11 +26,8 @@ getLandSpeedRecordFromWiki <- function() {
 		year <- append(year, fractionYear)
 	
 		# Get speed record
-		if (speedOverKilometerMph[it] == "—") {
-			# If speed over kilometer is a hyphen, columns shifted one entry left
-			# Speed over mile is column V7 instead of V8
-			fastestMph <- as.character(table[it,"V7"])
-		} else if (speedOverKilometerMph[it] == "") {
+		if ((speedOverKilometerMph[it] == "—") || (speedOverKilometerMph[it] == "")) {
+			# If speed over kilometer is a hyphen or empty, use speed over mile
 			fastestMph <- speedOverMileMph[it]
 		} else {
 			fastestMph <- speedOverKilometerMph[it]
